@@ -372,6 +372,7 @@ def main():
     elif engname == "tinker":
         # Tinker-specific options
         GenOpts["tinkerpath"] = TgtOptions["tinkerpath"]
+        GenOpts["tinker9path"] = TgtOptions["tinker9path"]
         EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
         EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")

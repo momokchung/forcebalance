@@ -77,7 +77,7 @@ def parse_interactions(input_file):
             else:
                 warn_press_key("Encountered section keyword %s when already in section %s" % (word, section))
         elif section == "GLOBAL":
-            if key in ['keyfile', 'energy_unit']:
+            if key in ['keyfile', 'energy_unit', 'bulk']:
                 Globals[key] = s[1]
             elif key == 'optimize':
                 if len(s) == 1 or s[1].lower() in ['y','yes','true']:
@@ -113,6 +113,8 @@ def parse_interactions(input_file):
                 InterDict[key] = float(s[1])
             elif key == 'weight':
                 InterDict[key] = float(s[1])
+            elif key == 'index':
+                InterDict[key] = int(s[1])
             else:
                 warn_press_key("Encountered unsupported key %s in section %s on line %i" % (key, section, ln))
     return Globals, Systems, Interactions
@@ -174,6 +176,9 @@ class BindingEnergy(Target):
         opts = self.sys_opts[sysname]
         return self.engines[sysname].energy_rmsd(optimize = (opts['optimize'] if 'optimize' in opts else False))
 
+    def system_driverS(self, sysname):
+        return self.engines[sysname].energyS()
+
     def indicate(self):
         printcool_dictionary(self.PrintDict,title="Interaction Energies (kcal/mol), Objective = % .5e\n %-20s %9s %9s %9s %11s" % 
                              (self.energy_part, "Interaction", "Calc.", "Ref.", "Delta", "Term"))
@@ -192,18 +197,31 @@ class BindingEnergy(Target):
             self.FF.make(mvals_)
             VectorD_ = []
             for sys_ in self.sys_opts:
-                Energy_, RMSD_ = self.system_driver(sys_)
-                # Energies are stored in a dictionary.
-                EnergyDict[sys_] = Energy_
-                RMSDNrm_ = RMSD_ / self.rmsd_denom
-                w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
-                VectorD_.append(np.sqrt(w_)*RMSDNrm_)
-                if not in_fd() and RMSD_ != 0.0:
-                    self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_, w_*RMSDNrm_**2)
+                bulk_value = self.sys_opts[sys_].get('bulk')
+                if bulk_value is None:
+                    Energy_, RMSD_ = self.system_driver(sys_)
+                    # Energies are stored in a dictionary.
+                    EnergyDict[sys_] = Energy_
+                    RMSDNrm_ = RMSD_ / self.rmsd_denom
+                    w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
+                    VectorD_.append(np.sqrt(w_)*RMSDNrm_)
+                    if not in_fd() and RMSD_ != 0.0:
+                        self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_, w_*RMSDNrm_**2)
+                elif bulk_value == 'true':
+                    EnergyS_ = self.system_driverS(sys_)
+                    # Energies are stored in a dictionary.
+                    EnergyDict[sys_] = EnergyS_
+                    VectorD_.extend([0.0] * len(EnergyS_))
             VectorE_ = []
             for inter_ in self.inter_opts:
+                index_ = self.inter_opts[inter_].get('index', 0)
                 def encloseInDictionary(matchobj):
-                    return 'EnergyDict["' + matchobj.group(0)+'"]'
+                    sysname = matchobj.group(0)
+                    bulk_value = self.sys_opts[sysname].get('bulk')
+                    if bulk_value is None:
+                        return 'EnergyDict["' + sysname+'"]'
+                    elif bulk_value == 'true':
+                        return f'EnergyDict["{sysname}"][{index_}]'
                 # Here we need to evaluate a mathematical expression of the stored variables in EnergyDict.
                 # We start by enclosing every variable in EnergyDict[""] and then calling eval on it.
                 evalExpr = re.sub('[A-Za-z_][A-Za-z0-9_]*', encloseInDictionary, self.inter_opts[inter_]['equation'])

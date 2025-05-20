@@ -25,7 +25,7 @@ except:
     logger.warning("Gromacs module import failed\n")
 
 try:
-    from forcebalance.tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
+    from forcebalance.tinkerio import AbInitio_TINKER, Vibration_TINKER, Potential_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
 except:
     logger.warning(traceback.format_exc())
     logger.warning("Tinker module import failed\n")
@@ -118,6 +118,7 @@ Implemented_Targets = {
     'MOMENTS_TINKER':Moments_TINKER,
     'MOMENTS_GMX':Moments_GMX,
     'MOMENTS_OPENMM':Moments_OpenMM,
+    'POTENTIAL_TINKER':Potential_TINKER,
     'HYDRATION_OPENMM':Hydration_OpenMM,
     'OPTGEO_OPENMM': OptGeoTarget_OpenMM,
     'OPTGEO_SMIRNOFF': OptGeoTarget_SMIRNOFF,

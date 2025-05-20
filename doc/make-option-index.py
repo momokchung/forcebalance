@@ -20,6 +20,10 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Targets that use GROMACS",
                                 "required" : True,
                                 "recommend" : "Depends on your local installation and environment."
                                 },
+                "tinker9path" : {"scope" : "Targets that use TINKER9",
+                                "required" : False,
+                                "recommend" : "Depends on your local installation and environment."
+                                },
                 "gmxsuffix" : {"scope" : "Targets that use GROMACS",
                                "required" : False,
                                "long" : """Depending on how GROMACS is configured and installed, a suffix may be appended to executable
