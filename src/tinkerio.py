@@ -595,12 +595,16 @@ class TINKER(Engine):
             else: optprog = "optimize"
         elif method == "bfgs":
             if self.rigid: optprog = "minrigid"
-            else: optprog = "minimize"
+            else:
+                if self.use_tinker9:
+                    optprog = "minimize9"
+                else:
+                    optprog = "minimize"
         else:
             raise RuntimeError("Incorrect choice of method for TINKER.optimize()")
         
         # Actually run the minimize program
-        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
+        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit), use_tinker9=self.use_tinker9)
 
         ## TODO: TINKER optimizer has some stochastic behavior for converging to different minima
         ## This is work in progress and should be revisited in the future, along with taking
@@ -1201,6 +1205,9 @@ class Liquid_TINKER(Liquid):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
         # Error checking.
         for i in self.nptfiles:
+            logger.info("self.nptfile\n" + i)
+            logger.info("self.root\n" + self.root)
+            logger.info("self.tgtdir\n" + self.tgtdir)
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
                 logger.error('Please provide %s; it is needed to proceed.\n' % i)
                 raise RuntimeError
@@ -1220,7 +1227,7 @@ class Liquid_TINKER(Liquid):
             self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
         if (temperature, pressure) in self.DynDict:
             dynsrc = self.DynDict[(temperature, pressure)]
-            dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
+            dyndest = os.path.join('liquid.dyn')
             logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
             shutil.copy2(dynsrc,dyndest)
             self.nptfiles.append(dyndest)
