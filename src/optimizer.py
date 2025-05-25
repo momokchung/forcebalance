@@ -490,6 +490,7 @@ class Optimizer(forcebalance.BaseClass):
                 logger.info("Reading initial objective, gradient, Hessian from checkpoint file\n")
                 xk, X, G, H   = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H']
                 X_hist, trust = self.chk['X_hist'], self.chk['trust']
+                data = {'X':X, 'G':G, 'H':H}
             else:
                 self.adjh(trust)
                 printcool("Iteration %i: Evaluating objective function\nand derivatives through %s order" % (ITERATION, "first" if Ord == 1 else "second"), color=4, bold=0)
@@ -534,7 +535,7 @@ class Optimizer(forcebalance.BaseClass):
                         X_hist = np.append(X_hist, X)
                         # Write checkpoint file.
                         # (Lines copied from below for a good step.)
-                        self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'X_hist': X_hist, 'trust': trust}
+                        self.chk = {'xk': xk_prev, 'X' : X, 'G' : G, 'H': H, 'X_hist': X_hist, 'trust': trust}
                         if self.wchk_step:
                             self.writechk()           
                         outfnm = self.save_mvals_to_input(xk)
@@ -717,7 +718,7 @@ class Optimizer(forcebalance.BaseClass):
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (pk_prev[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
                 logger.info(bar)
             # Write checkpoint file.
-            self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'X_hist': X_hist, 'trust': trust}
+            self.chk = {'xk': xk_prev, 'X' : X, 'G' : G, 'H': H, 'X_hist': X_hist, 'trust': trust}
             if self.wchk_step:
                 self.writechk()           
             outfnm = self.save_mvals_to_input(xk)
