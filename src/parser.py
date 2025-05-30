@@ -229,7 +229,8 @@ tgt_opts_types = {
                  # This is forced to ON as of 2020-08-20
                  # "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
                  "remote_backup"    : (0, -50, 'When running remote target, back up files at the remote location.', 'Liquid, lipid and remote targets', 'liquid, lipid, remote'),
-                 "pure_num_grad"    : (0, -50, 'Pure numerical gradients -- launch two additional simulations for each perturbed forcefield parameter, and compute derivatives using 3-point formula. (This is very expensive and should only serve as a sanity check)')
+                 "pure_num_grad"    : (0, -50, 'Pure numerical gradients -- launch two additional simulations for each perturbed forcefield parameter, and compute derivatives using 3-point formula. (This is very expensive and should only serve as a sanity check)'),
+                 "dcd_archive"      : (0, 0, 'When saving DCD instead of ARC files.', 'Tinker molecular dynamics', 'liquid_tinker'),
                  },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "energy_denom" : (1.0, 100, 'Energy denominator in kcal/mol for objective function and lower energy limit for attenuating weights where applicable', 'Multiple targets that involve realtive energies', 'abinitio, binding, hydration, interaction, torsionprofile'),

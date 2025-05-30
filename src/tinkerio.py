@@ -1189,6 +1189,8 @@ class Liquid_TINKER(Liquid):
         self.set_option(tgt_opts,'liquid_coords',default='liquid.xyz',forceprint=True)
         # Name of the gas coordinate file.
         self.set_option(tgt_opts,'gas_coords',default='gas.xyz',forceprint=True)
+        # Name of tinker trajectory file type.
+        self.set_option(tgt_opts,'dcd_archive',default=0,forceprint=False)
         # Class for creating engine object.
         self.engine_ = TINKER
         # Name of the engine to pass to npt.py.
@@ -1214,7 +1216,11 @@ class Liquid_TINKER(Liquid):
         # Send back the trajectory file.
         self.extra_output = ['liquid.dyn']
         if self.save_traj > 0:
-            self.extra_output += ['liquid-md.arc']
+            if self.dcd_archive == 1:
+                traj_suf = "dcd"
+            else:
+                traj_suf = "arc"
+            self.extra_output += ['liquid-md.%s' % traj_suf]
         # Dictionary of .dyn files used to restart simulations.
         self.DynDict = OrderedDict()
         self.DynDict_New = OrderedDict()
